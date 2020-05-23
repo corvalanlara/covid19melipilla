@@ -1,11 +1,13 @@
 const formato = {year: 'numeric', month: 'long', day: 'numeric'};
 
-var svgWidth = 600;
-var svgHeight = 480;
-var margin = {top: 20, right: 20, bottom: 30, left: 50};
-var width = svgWidth - margin.left - margin.right;
-var height = svgHeight - margin.top - margin.bottom;
-var svg = d3.select("#dataviz")
+
+function draw(data, columna) {
+	var svgWidth = 600;
+	var svgHeight = 480;
+	var margin = {top: 20, right: 20, bottom: 30, left: 50};
+	var width = svgWidth - margin.left - margin.right;
+	var height = svgHeight - margin.top - margin.bottom;
+	var svg = d3.select("#dataviz")
 		.append("svg")
   		.attr("preserveAspectRatio", "xMinYMin meet")
   		.attr("viewBox", "0 0 600 480")
@@ -14,7 +16,6 @@ var svg = d3.select("#dataviz")
 			"translate(" + margin.left + "," + margin.top + ")" );
 
 
-function draw(data, columna) {
 	var x = d3.scaleTime()
 		.domain(d3.extent(data, function(d) { return d.fecha; }))
 		.range([0, width]);
@@ -103,6 +104,7 @@ var app = new Vue({
 	data: {
 		actual: 0,
 		fecha: "",
+		porcentaje: 0,
 	},
 	created() {
 		let este = this;
@@ -116,6 +118,7 @@ var app = new Vue({
 			delete da["Comuna"];
 			delete da["Codigo comuna"];
 			delete da["Codigo region"];
+			var pobl = Number(da["Poblacion"]);
 			delete da["Poblacion"];
 			delete da["Region"];
 			delete da["Tasa"];
@@ -133,6 +136,8 @@ var app = new Vue({
 			var ultimo = objetos[objetos.length - 1];
 			este.actual = ultimo.contagiados;
 			este.fecha = ultimo.fecha.toLocaleDateString('es-CL', formato);
+			este.porcentaje = Number((ultimo.contagiados * 100) / pobl).toFixed(2);
+			console.log(pobl);
 			draw(objetos, "contagiados");
 		});
 	},
